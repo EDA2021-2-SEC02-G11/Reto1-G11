@@ -14,5 +14,9 @@ data_dir = file_path + '/Data/'
 # sys.path.insert(0, os.path.abspath(file_path))
 # data_dir = file_dir + '/Data/'
 # =============================================================================
+
+
 # Lo cambié porque daba una ruta errónea, de forma App/Data en donde Data 
-# estaba dentro de App, así que no encontraba los archivos.
+# estaba dentro de App, así que no encontraba los archivos. No sé si es 
+# dependiente del computador... si en el tuyo no funciona este cambio, 
+# comenta mi cambio y descomenta la original.

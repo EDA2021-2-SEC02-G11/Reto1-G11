@@ -29,40 +29,33 @@ import config as cf
 from datetime import datetime
 import time
 from DISClib.ADT import list as lt
-from DISClib.Algorithms.Sorting import shellsort as sa
-from DISClib.Algorithms.Sorting import insertionsort as ins
-from DISClib.Algorithms.Sorting import mergesort as mer
-from DISClib.Algorithms.Sorting import quicksort as quc
-from DISClib.Algorithms.Sorting import selectionsort as sel
+from DISClib.Algorithms.Sorting import shellsort
+from DISClib.Algorithms.Sorting import insertionsort
+from DISClib.Algorithms.Sorting import mergesort
+from DISClib.Algorithms.Sorting import quicksort
+from DISClib.Algorithms.Sorting import selectionsort
 assert cf
 
-"""
-Se define la estructura de un catálogo de obras de arte. 
-El catálogo tendrá dos listas, una para las obras de arte, 
-otra para los artistas de estas.
-"""
-
-# Construccion de modelos
+# Construcción de modelos
 
 def newCatalog():
     """
-    Inicializa el catálogo de obras de arte. 
-    Crea listas vacías con los siguientes própositos:
-    Para guardar las obras de arte
-    Para guardar los autores
-    Quizá luego se añaden más listas con los autores ordenados o lo que se necesite.
+    Inicializa el catálogo de obras de arte.
     """
     catalog = {'artists': None,
                'artworks': None,
-               'artists_chronologically': None}
+               'artists_chronologically': None,
+               'artworks_chronologically': None}
     
-    catalog['artists'] = lt.newList('ARRAY_LIST', cmpfunction=compare_artists)
-    catalog['artworks'] = lt.newList('ARRAY_LIST', cmpfunction=compare_artworks)
-    catalog['artists_chronologically'] = lt.newList('ARRAY_LIST', cmpfunction=compare_artworks)
-    
+    artists = lt.newList('ARRAY_LIST', cmpfunction=compare_artists)
+    catalog['artists'] = artists
+    artworks = lt.newList('ARRAY_LIST', cmpfunction=compare_artworks)
+    catalog['artworks'] = artworks
+    catalog['artworks_chronologically'] = sortArtworks(artworks)[1]
+    catalog['artists_chronologically'] = sortArtists(artists)[1]
     return catalog
 
-# Funciones para agregar informacion al catalogo
+# Funciones para agregar informacion al catálogo
 
 def addArtist(catalog, artist):
     # Se añade el artista al final de la lista de artistas en el catálogo.
@@ -76,17 +69,21 @@ def addArtwork(catalog, artwork):
 
 # Funciones de consulta
 
+def artists_chronologically_interval(ano_inicial, ano_final):
+    pass
+
+def artworks_chronologically_interval(fecha_inicial, fecha_final):
+    pass
+
 # Funciones utilizadas para comparar elementos dentro de una lista
 
-def compare_artists(artist1,artist):
-    if artist1.lower() in artist["artists"].lower():
-        return 0
-    return -1
+def compare_artists():
+    pass
 
 def compare_artworks():
     pass
 
-def cmpArtworkByDateAcquired(artwork1:dict , artwork2:dict)->int:
+def compare_artworks_DateAcquired(artwork1:dict , artwork2:dict)->int:
     """
     Compara dos obras de arte por la fecha en la que fueron adquiridas, 
     'DateAcquired'.
@@ -116,16 +113,87 @@ def cmpArtworkByDateAcquired(artwork1:dict , artwork2:dict)->int:
         return -1
     return 0
 
+def compare_artists_BeginDate(artist1:dict , artist2:dict)->int:
+    """
+    Compara dos artistas por su fecha de nacimiento,'BeginDate'.
+    
+    Si el 'BeginDate' de un artista vacío, la fecha de nacimiento se toma como 
+    anterior a todas las demás.
+
+    Parámetros
+    ----------
+    artist1 : dict
+        Informacion del primer artista que incluye su valor 'BeginDate'.
+    artist2 : dict
+        Informacion del segundo artista que incluye su valor 'DateAcquired'.
+
+    Retorno
+    -------
+    int
+        0 si artwork1 fue adquirido más recientemente que artwork2.
+        -1 si artwork2 fue adquirido más recientemente que artwork1.
+    """
+    if artist1["BeginDate"]=="" or artist2["BeginDate"]=="":
+        if artist1["DateAcquired"]=="":
+            return -1
+        else:
+            return 0
+    elif artist1["BeginDate"]<artist2["BeginDate"]:
+        return -1
+    return 0
+
 # Funciones de ordenamiento
 
-def sortArtworks(catalog, size):
-    sub_list = lt.subList(catalog['artworks'], 1, size)
-    sub_list = sub_list.copy()
+def sortArtworks(artworks, algorithm=mergesort):
+    """
+    Ordena las obras de arte por la fecha en la que fueron adquiridas, 
+    'DateAcquired', haciendo uso del algoritmo dado. 
+    Informa cuánto tiempo demoró en ordenarlas.    
+
+    Parameters
+    ----------
+    artworks : 
+        Lista de obras de arte.
+    algorithm : 
+        Algoritmo que será usado para ordenar.
+
+    Returns
+    -------
+    elapsed_time_mseg : float
+        Tiempo que tardó el ordenamiento en milisegundos.
+    sorted_list : 
+        Lista de obras de arte ordenadas por la fecha en la que fueron 
+        adquiridas.
+    """    
     start_time = time.process_time()
-    sorted_list= sa.sort(sub_list, cmpArtworkByDateAcquired)
+    sorted_list = algorithm.sort(artworks, compare_artworks_DateAcquired)
     stop_time = time.process_time()
     elapsed_time_mseg = (stop_time - start_time)*1000
     return elapsed_time_mseg, sorted_list
 
-# Nosotros elejimos el algoritmo: sa.sort, ins.sort, mer.sort, quc.sort, sel.sort.
+def sortArtists(artists, algorithm=mergesort):
+    """
+    Ordena los artistas por su fecha de nacimiento, 'BeginDate', haciendo 
+    uso del algoritmo dado. 
+    
+    Informa cuánto tiempo demoró en ordenarlos.    
 
+    Parameters
+    ----------
+    artists : 
+        Lista de artistas.
+    algorithm : 
+        Algoritmo que será usado para ordenar.
+
+    Returns
+    -------
+    elapsed_time_mseg : float
+        Tiempo que tardó el ordenamiento en milisegundos.
+    sorted_list : 
+        Lista de artistas ordenados por su fecha de nacimiento.
+    """    
+    start_time = time.process_time()
+    sorted_list = algorithm.sort(artists, compare_artists_BeginDate)
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)*1000
+    return elapsed_time_mseg, sorted_list

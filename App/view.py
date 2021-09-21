@@ -37,7 +37,7 @@ def printMenu():
     """
     Imprime las opciones del menú.
     """
-    print("Menú de opciones:\n")
+    print("\nMenú de opciones:\n")
     print("0. Cargar información en el catálogo.")
     print("Requisito 1. Listar cronológicamente las artistas.")
     print("Requisito 2. Listar cronológicamente los adquisiciones.")
@@ -84,16 +84,37 @@ while True:
         print('\nÚltimas tres obras de arte cargadas:\n')
         for i in [-3,-2,-1]:
             print(str(lt.getElement(catalog['artworks'],i)))  
-    elif inputs==2:
-        size = input("Indique tamaño de la muestra: ")
-        result = controller.sortArtworks(catalog, int(size))
-        print('Primeras tres obras de arte cargadas:\n')
-        for i in [3,2,1]:
-            print(str(lt.getElement(result[1],i)))
-        print('Últimas tres obras de arte cargadas:\n')
+    elif inputs==1:
+        ano_inicial = input("Indique un año inicial: ")
+        ano_final = input("Indique un año final: ")
+# =============================================================================
+#         En este momento, los artistas se ordenan cuando se cargan los datos
+#         al catálogo, que creo yo es lo más eficiente. Me toca hacer una función
+#         que, de esa lista ordenada, coja solo los artistas en el rango
+#         cronológico dado (en este momento coge todos los cargados). Antes se 
+#         estaba usando un tamaño de muestra, que era más fácil, pero toca
+#         hacerlo con rangos.
+# =============================================================================
+        print('\nPrimeros tres artistas del rango cronológico:\n')
+        for i in [1,2,3]:
+            print(str(lt.getElement(catalog['artists_chronologically'],i)))
+        print('\nÚltimos tres artistas del rango cronológico:\n')
         for i in [-3,-2,-1]:
-            print(str(lt.getElement(result[1],i)))
-        print("Se demoró ",result[0])
+            print(str(lt.getElement(catalog['artists_chronologically'],i)))
+    elif inputs==2:
+        fecha_inicial = input("Indique una fecha inicial con el formato (AAAA-MM-DD): ")
+        fecha_final = input("Indique una fecha final con el formato (AAAA-MM-DD): ")
+# =============================================================================
+#         Al igual que la anterior, las obras de arte se ordenan cuando se 
+#         cargan al catálogo y se están tomando todas, no se está respetando el 
+#         rango. Toca hacer esa función.
+# =============================================================================
+        print('\nPrimeras tres obras de arte adquiridas en el rango cronológico:\n')
+        for i in [1,2,3]:
+            print(str(lt.getElement(catalog['artworks_chronologically'],i)))
+        print('\nÚltimas tres obras de arte adquiridas en el rango cronológico:\n')
+        for i in [-3,-2,-1]:
+            print(str(lt.getElement(catalog['artworks_chronologically'],i)))
     elif (inputs==1) or ((inputs>2) and (inputs<7)):
         print("Este requerimiento aún no se ha implementado.")
     elif inputs >= 8:

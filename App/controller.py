@@ -68,8 +68,11 @@ def loadArtworks(catalog):
 
 # Funciones de ordenamiento
 
-def sortArtworks(catalog, size):
-    return model.sortArtworks(catalog, size)
+def sortArtworks(artworks):
+    return model.sortArtworks(artworks)
+
+def sortArtists(artists):
+    return model.sortArtists(artists)
 
 # Funciones de consulta sobre el catálogo
 
