@@ -50,12 +50,12 @@ def newCatalog():
     """
     catalog = {'artists_BeginDate': None,
                'artworks_DateAcquired': None,
-               'artists_artworks':None,
+               'artworks_Artist':None,
                'nationality':None}
     
     catalog['artists_BeginDate'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtists_BeginDate)
     catalog['artworks_DateAcquired'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtists_BeginDate)
-    catalog['artists_artworks'] = lt.newList('ARRAY_LIST', cmpfunction=compareartists_artworks)
+    catalog['artworks_Artist'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_Artist)
     catalog['nationality'] = lt.newList('ARRAY_LIST', cmpfunction=compareNationality)
 
     return catalog
@@ -73,16 +73,16 @@ def addArtwork(catalog, artwork):
     ids = ids[1:-1].split(",")
     for id_ in ids:
         id_ = int(id_.strip())
-        addArtworkArtist(catalog, id_, artwork)
+        addArtworks_Artist(catalog, id_, artwork)
         #addNationality(catalog,id_,artwork)
-    
-def addArtworkArtist(catalog, id_:int, artwork):
-    artist_artwork = catalog['artists_artworks']
+
+def addArtworks_Artist(catalog, id_:int, artwork):
+    artist_artwork = catalog['artworks_Artist']
     posartist = lt.isPresent(artist_artwork, id_)
     if posartist > 0:
         artist_id = lt.getElement(artist_artwork, posartist)
     else:
-        artist_id = newArtworkArtist(id_)
+        artist_id = newArtworks_Artist(id_)
         lt.addLast(artist_artwork, artist_id)
     lt.addLast(artist_id['artworks'],artwork )
 
@@ -106,14 +106,14 @@ def addNationality(catalog, id_:int, artwork):
 #     ids = {'artist_id': artist_id, 'artwork_id': artwork_id}
 #     return ids
 # =============================================================================
-def newArtworkArtist(artist_id):
+def newArtworks_Artist(id_):
     """
-    Crea una nueva estructura para modelar los autores de cada obra
+    Crea una nueva estructura para modelar las obras por autor.
     """
-    nationality = {'artist':"",'artworks':None}
-    nationality['artist'] = artist_id
-    nationality['artworks'] = lt.newList('ARRAY_LIST')
-    return nationality
+    answ = {'artist':"",'artworks':None}
+    answ['artist'] = id_
+    answ['artworks'] = lt.newList('ARRAY_LIST')
+    return answ
 
 def newNationality(nation):
     """
@@ -123,8 +123,10 @@ def newNationality(nation):
     artwork_artist['nation'] = nation
     artwork_artist['artworks'] = lt.newList('ARRAY_LIST')
     return artwork_artist
+
 # Funciones de consulta
 
+# Req. 1
 def rangoArtists(catalog, anio1, anio2):
     artists = catalog["artists_BeginDate"].copy()
     start_time = time.process_time()
@@ -147,7 +149,8 @@ def rangoArtists(catalog, anio1, anio2):
     stop_time = time.process_time()
     elapsed_time_mseg = (stop_time - start_time)*1000
     return answ
-    
+
+# Req. 2
 def rangoArtworks(catalog, fecha1, fecha2):
     artworks = catalog["artworks_DateAcquired"].copy()
     start_time = time.process_time()
@@ -172,6 +175,7 @@ def rangoArtworks(catalog, fecha1, fecha2):
     elapsed_time_mseg = (stop_time - start_time)*1000
     return answ
 
+# Req. 3
 def id_artist(catalog, artist):
     """
     reorna el id de un artista. O(n)
@@ -187,32 +191,34 @@ def artist_artworks(catalog, artist):
     """
     Nombre, ID y lista de las obras de un artista determinado. O(n)
     """
-    id_=id_artist(catalog, artist)
-    list_=lt.newList('ARRAY_LIST')
+    id_=id_artist(catalog, artist) # ID del artista
+    artworks_by_artist=lt.newList('ARRAY_LIST',key='ObjectID')
     for i in lt.iterator(catalog['artworks_DateAcquired']):
-        if id_ in i['ConstituentID']:                
-            lt.addLast(list_, i)
-    return artist, id_, list_
+        if id_ in i['ConstituentID'][1:-1].split(","):
+            pos_artwork=lt.isPresent(artworks_by_artist,i)
+            if pos_artwork<=0: # Si no está presente
+                lt.addLast(artworks_by_artist, i)
+    return artworks_by_artist,artist,id_
 
 def artist_medium(catalog, artist):
-    mediums_= lt.newList('ARRAY_LIST')
+    mediums= lt.newList('ARRAY_LIST')
     mediums_count = lt.newList('ARRAY_LIST')
-    artist, id_, list_ = artist_artworks(catalog, artist)
-    for i in lt.iterator(list_):
-        posmedium = lt.isPresent(mediums_, i['Medium'])
-        if posmedium == 0:
-            medium = lt.addLast(mediums_, i['Medium'])
+    artworks_by_artist,artist,id_= artist_artworks(catalog, artist)
+    for i in lt.iterator(artworks_by_artist):
+        posmedium = lt.isPresent(mediums, i['Medium'])
+        if posmedium <= 0: # Si no está el medio en la lista de medios
+            medium = lt.addLast(mediums, i['Medium'])
             lt.addLast(mediums_count, 1)
-        else:
-            lt.changeInfo(mediums_count, posmedium, lt.getElement(mediums_count, posmedium))
+        else: # Si sí está el medio en la lista de medios
+            lt.changeInfo(mediums_count, posmedium, lt.getElement(mediums_count, posmedium)+1)
     greatest=0
-    count=0
-    for num in lt.iterator(mediums_count):
-        count+=1
-        if num > greatest:
-            greatest=num
-            pos_most_used=count
-    return artist,id_, list_,mediums_,mediums_count,pos_most_used
+    pos_actual=0
+    for cuenta_medium in lt.iterator(mediums_count):
+        pos_actual+=1
+        if cuenta_medium > greatest:
+            greatest=cuenta_medium
+            pos_most_used=pos_actual
+    return artist,id_,artworks_by_artist,mediums,mediums_count,pos_most_used
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
@@ -252,7 +258,7 @@ def compareArtists_BeginDate(artist1,artist2):
     else:
         return 0
 
-def compareartists_artworks(artist_id, artist):
+def compareArtworks_Artist(artist_id, artist):
     if artist_id == artist['artist']:
         return 0
     return -1

@@ -72,7 +72,7 @@ def printloadData():
         # Toca quitar lo de artists_artworks esto del cargar datos, pero funciona!
     print('\nARTISTS ARTWORKS:\n')
     for i in [12,13,14]:
-        print(str(lt.getElement(catalog['artists_artworks'],i)))
+        print(str(lt.getElement(catalog['artworks_Artist'],i)))
     return catalog
     
 def printReq1():
@@ -123,17 +123,16 @@ def printReq2():
     
 def printReq3():
     artist=input("Ingrese el nombre del artista: ")
-    artist,id_, list_,mediums_,mediums_count,pos_most_used=controller.artist_medium(catalog,artist)
+    artist,id_,artworks_by_artist,mediums,mediums_count,pos_most_used=controller.artist_medium(catalog,artist)
     print("======================== Req No. 3 Inputs ========================")
-    print("Examinar el trabajo del artista de nombre ",artist)
+    print("Examinar el trabajo del artista de nombre: ",artist)
     print("======================== Req No. 3 Respuesta ========================")
     print("El artista ",str(artist).strip(),' con código ',str(id_),' tiene ',
-          str(lt.size(list_)), 'obras en el MoMA.')
-    print("Medios: ",mediums_)
-# =============================================================================
-#     print('Usó ',mediums_count,' medios o técnicas distintas en su trabajo.')
-#     print('La técnica que más usó es: ',lt.getElement(mediums_,pos_most_used),'.')
-# =============================================================================
+          str(lt.size(artworks_by_artist)), 'obras en el MoMA.')
+    print('Usó ',str(lt.size(mediums)),' medios o técnicas distintas en su trabajo.')
+    print('La técnica que más usó es: ',str(lt.getElement(mediums,pos_most_used)),'.')
+    print('El listado de las obras de dicha técnica es: ')
+    
 def printReq4():
     print("Este requerimiento aún no se ha implementado.")
     
