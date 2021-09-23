@@ -56,9 +56,11 @@ def printloadData():
     artist=controller.sortArtists_BeginDate(catalog)
     artwork=controller.sortArtworks_DateAcquired(catalog)
     artwork_date=controller.sortArtworks_Date(catalog)
+    nationality=controller.sortNationality(catalog)
     catalog["artists_BeginDate"]=artist[1]
     catalog["artworks_DateAquired"]=artwork[1]
     catalog["artworks_Date"]=artwork_date[1]
+    catalog["nationality"]=nationality[1]
     print('Número de artistas en el catálogo: ',
           str(lt.size(catalog['artists_BeginDate'])))
     print('Número de obras de arte en el catálogo: ',
@@ -170,7 +172,7 @@ def printReq3():
     elapsed_time_mseg = (stop_time - start_time)*1000
     print("Se demoro: ",str(elapsed_time_mseg))
     
-def printReq4():
+def printReq4(catalog):
     start_time = time.process_time()
     print("======================== Req No. 4 Inputs ========================")
     print("Ranking de paises por su numero de obras en el MoMa ")
@@ -272,7 +274,7 @@ while True:
         elif inputs==3:
             printReq3()
         elif inputs==4:
-            printReq4()
+            printReq4(catalog)
         elif inputs==5:
             printReq5()
         elif inputs==6:
