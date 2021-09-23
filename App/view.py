@@ -87,6 +87,7 @@ def printloadData():
     answ1._max_width = {'Título':40,'Medio o técnica':20,'Fecha':20,'Adquisición':40,
                         'Dimensiones':40}
     print(answ1)
+    print(lt.getElement(catalog['artworks_DateAcquired'],30))
     return catalog
     
 def printReq1():
@@ -161,18 +162,30 @@ def printReq4():
     
 def printReq5():
     department=input("Ingrese el nombre del departamento: ")
-    
-    
+    artworks_by_department,department,precios_obras,precio_final,peso=controller.transport(catalog, department)
     print("======================== Req No. 5 Inputs ========================")
     print('Estime el costo de transportar todas las obras del departamento '+department+' del MoMA.')
     print("======================== Req No. 5 Respuesta ========================")
-    print('El MoMA transportará '+str(777)+' obras del departamento '+department+'.')
-    print('El precio estimado del servicio es: $'+str(777)+' USD.')
-    print('El peso estimado de todas las obras es de: '+str(777)+' kg.')
+    print('El MoMA transportará '+str(lt.size(artworks_by_department)).strip()
+          +' obras del departamento '+str(department)+'.')
+    print('El precio estimado del servicio es: $'+str(precio_final).strip()+' USD.')
+    print('El peso estimado de todas las obras es de: '+str(peso)+' kg.')
     print("Las cinco obras más antiguas que se van a transportar son: ")
-    # FALTA
+    answ = PrettyTable(['Título','Artista(s)','Clasificacion','Fecha','Medio',
+                        'Dimensiones','Costo'])
+    result=artworks_by_department
+    for i in [1,2,3,4,5]:        
+        answ.add_row([lt.getElement(result,i)['Title'],
+                      lt.getElement(result,i)['ConstituentID'], # TODO: Artista
+                      lt.getElement(result,i)['Classification'],
+                      lt.getElement(result,i)['Date'],
+                      lt.getElement(result,i)['Medium'],
+                      lt.getElement(result,i)['Dimensions'],
+                      lt.getElement(precios_obras,i)])
+    answ._max_width = {'Título':40,'Artista(s)':20,'Fecha':15,'Adquisición':15,
+                       'Medio':20,'Dimensiones':40,'Costo':15}
+    print(answ)
     print("Las cinco obras más costosas que se van a transportar son: ")
-    # FALTA
     
 def printReq6():
     print("Este requerimiento aún no se ha implementado.")

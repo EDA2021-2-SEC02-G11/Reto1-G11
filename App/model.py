@@ -230,15 +230,81 @@ def artist_medium(catalog, artist):
 
 def departament_artworks(catalog, department):
     """
-    ObjectID de las obras de un departamento determinado.
+    ObjectID de las obras de un departamento determinado. 
+    Ya ordenadas por fecha.
     """
     artworks_by_department=lt.newList('ARRAY_LIST',key='ObjectID')
-    for i in lt.iterator(catalog['artworks_DateAcquired']):
+    for i in lt.iterator(catalog['artworks_Date']):
         if i['Department'] == department:
             pos_artwork=lt.isPresent(artworks_by_department,i)
             if pos_artwork<=0: # Si no está presente
                 lt.addLast(artworks_by_department, i)              
     return artworks_by_department,department
+
+def condicion(medida):
+    """
+    Si la medida no existe o es 0, que sea 1 para que no afecte la multiplicación.
+    """
+    try:
+        medida=int(medida)
+    except:
+        medida=0
+    medida=medida/100 # Divido en 100 para pasar a metros
+    return medida
+    
+def transport(catalog, department):
+    artworks_by_department,department=departament_artworks(catalog, department)
+    precios_obras=lt.newList('ARRAY_LIST')
+    for obra in lt.iterator(artworks_by_department):
+#         O la obra es circular o tiene longitudes:
+        d1=condicion(obra['Depth (cm)'])
+        d2=condicion(obra['Height (cm)'])
+        d3=condicion(obra['Length (cm)'])
+        d4=condicion(obra['Width (cm)'])
+        if d1!=0:
+            metros=d1
+        else:
+            d1=1 # Si es 0, lo cambio a 1 para que no afecte la multiplicación de ahorita
+            if d2!=0:
+                metros=d2
+            else:
+                d2=1
+                if d3!=0:
+                    metros=d3
+                else:
+                    d3=1
+                    if d4!=0:
+                        metros=d4
+                    else:
+                        d4=1
+                        metros=0 # Metros es 0 si y sólo si todos son 0
+        if metros!=0: # Alguno no es 0
+            metros=d1*d2*d3*d4      
+#       La obra puede ser circular
+        if condicion(obra['Circumference (cm)']) != 1:
+            circ=condicion(obra['Circumference (cm)'])
+            radio = circ/(6.28318530718) # Circ/2pi = r
+            area = 3.141592*(radio)**2
+        elif condicion(obra['Diameter (cm)']) != 1: # Depronto toca con el diametro
+            d = condicion(obra['Diameter (cm)'])
+            area = 3.141592*(d/2)**2
+        else: # No es circular
+            area=0
+        try:
+            peso = int(obra['Weight (kg)'])
+        except:
+            peso=0.        
+        if peso==0. and area==0 and metros==0: # Ninguna está
+            precio_obra = 48.00
+        else: # alguna está
+            mas_grande= max([peso,area,metros])
+            precio_obra = 72.00*mas_grande
+        lt.addLast(precios_obras,precio_obra)
+    precio_final=0
+    for precio in lt.iterator(precios_obras):
+        precio_final+=precio
+    return artworks_by_department,department,precios_obras,precio_final,peso
+
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 

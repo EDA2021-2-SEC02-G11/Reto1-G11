@@ -88,8 +88,8 @@ def rangoArtworks(catalog, fecha1, fecha2):
 def artist_medium(catalog,artist):
     return model.artist_medium(catalog,artist)
 
-def departament_artworks(catalog, department):
-    return model.departament_artworks(catalog, department)
+def transport(catalog, department):
+    return model.transport(catalog, department)
 
 def id_artworks(catalog,author):
     return model.id_artworks(catalog, author)
