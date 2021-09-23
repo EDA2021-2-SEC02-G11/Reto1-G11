@@ -50,11 +50,13 @@ def newCatalog():
     """
     catalog = {'artists_BeginDate': None,
                'artworks_DateAcquired': None,
+#               'artworks_Date': None,
                'artworks_Artist':None,
                'nationality':None}
     
     catalog['artists_BeginDate'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtists_BeginDate)
-    catalog['artworks_DateAcquired'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtists_BeginDate)
+    catalog['artworks_DateAcquired'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_DateAcquired)
+#    catalog['artworks_Date'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_Date)
     catalog['artworks_Artist'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_Artist)
     catalog['nationality'] = lt.newList('ARRAY_LIST', cmpfunction=compareNationality)
 
@@ -231,7 +233,7 @@ def departament_artworks(catalog, department):
     ObjectID de las obras de un departamento determinado.
     """
     artworks_by_department=lt.newList('ARRAY_LIST',key='ObjectID')
-    for i in ltiterator(catalog['artworks_DateAcquired']):
+    for i in lt.iterator(catalog['artworks_DateAcquired']):
         if i['Department'] == department:
             pos_artwork=lt.isPresent(artworks_by_department,i)
             if pos_artwork<=0: # Si no está presente
