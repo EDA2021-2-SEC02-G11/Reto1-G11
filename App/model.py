@@ -50,12 +50,14 @@ def newCatalog():
     """
     catalog = {'artists_BeginDate': None,
                'artworks_DateAcquired': None,
-               'artists_artworks':None,
+               'artworks_Date': None,
+               'artworks_Artist':None,
                'nationality':None}
     
     catalog['artists_BeginDate'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtists_BeginDate)
-    catalog['artworks_DateAcquired'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtists_BeginDate)
-    catalog['artists_artworks'] = lt.newList('ARRAY_LIST', cmpfunction=compareartists_artworks)
+    catalog['artworks_DateAcquired'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_DateAcquired)
+    catalog['artworks_Date'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_Date)
+    catalog['artworks_Artist'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_Artist)
     catalog['nationality'] = lt.newList('ARRAY_LIST', cmpfunction=compareNationality)
 
     return catalog
@@ -66,23 +68,23 @@ def addArtist(catalog, artist):
     lt.addLast(catalog['artists_BeginDate'], artist)
     ids=artist["Nationality"]
 
-
 def addArtwork(catalog, artwork):
     lt.addLast(catalog['artworks_DateAcquired'], artwork)
+    lt.addLast(catalog['artworks_Date'], artwork)
     ids = artwork['ConstituentID']
     ids = ids[1:-1].split(",")
     for id_ in ids:
         id_ = int(id_.strip())
-        addArtworkArtist(catalog, id_, artwork)
+        addArtworks_Artist(catalog, id_, artwork)
         addNationality(catalog,id_,artwork)
-    
-def addArtworkArtist(catalog, id_:int, artwork):
-    artist_artwork = catalog['artists_artworks']
+
+def addArtworks_Artist(catalog, id_:int, artwork):
+    artist_artwork = catalog['artworks_Artist']
     posartist = lt.isPresent(artist_artwork, id_)
     if posartist > 0:
         artist_id = lt.getElement(artist_artwork, posartist)
     else:
-        artist_id = newArtworkArtist(id_)
+        artist_id = newArtworks_Artist(id_)
         lt.addLast(artist_artwork, artist_id)
     lt.addLast(artist_id['artworks'],artwork )
 
@@ -97,23 +99,16 @@ def addNationality(catalog, id_, artwork):
         lt.addLast(nationality, nation_id)
     lt.addLast(nation_id['artworks'],artwork )
 
-#changeInfo(lst, pos, element)
 # Funciones para creacion de datos
 
-# =============================================================================
-# def match_ids(catalog):
-#     for i in lt.iterator(catalog['artists_BeginDate']):
-#     ids = {'artist_id': artist_id, 'artwork_id': artwork_id}
-#     return ids
-# =============================================================================
-def newArtworkArtist(artist_id):
+def newArtworks_Artist(id_):
     """
-    Crea una nueva estructura para modelar los autores de cada obra
+    Crea una nueva estructura para modelar las obras por autor.
     """
-    nationality = {'artist':"",'artworks':None}
-    nationality['artist'] = artist_id
-    nationality['artworks'] = lt.newList('ARRAY_LIST')
-    return nationality
+    answ = {'artist':"",'artworks':None}
+    answ['artist'] = id_
+    answ['artworks'] = lt.newList('ARRAY_LIST')
+    return answ
 
 def newNationality(nation):
     """
@@ -123,8 +118,10 @@ def newNationality(nation):
     artwork_artist['nation'] = nation
     artwork_artist['artworks'] = lt.newList('ARRAY_LIST')
     return artwork_artist
+
 # Funciones de consulta
 
+# Req. 1
 def rangoArtists(catalog, anio1, anio2):
     artists = catalog["artists_BeginDate"].copy()
     start_time = time.process_time()
@@ -147,7 +144,8 @@ def rangoArtists(catalog, anio1, anio2):
     stop_time = time.process_time()
     elapsed_time_mseg = (stop_time - start_time)*1000
     return answ
-    
+
+# Req. 2
 def rangoArtworks(catalog, fecha1, fecha2):
     artworks = catalog["artworks_DateAcquired"].copy()
     start_time = time.process_time()
@@ -172,9 +170,10 @@ def rangoArtworks(catalog, fecha1, fecha2):
     elapsed_time_mseg = (stop_time - start_time)*1000
     return answ
 
+# Req. 3
 def id_artist(catalog, artist):
     """
-    retorna el id de un artista. O(n)
+    reorna el id de un artista. O(n)
     """
     id_=0
     for i in lt.iterator(catalog['artists_BeginDate']):
@@ -182,6 +181,45 @@ def id_artist(catalog, artist):
             id_ = i['ConstituentID']
             break
     return id_
+
+def artist_artworks(catalog, artist):
+    """
+    Nombre, ID y lista de las obras de un artista determinado. O(n)
+    """
+    id_=id_artist(catalog, artist) # ID del artista
+    artworks_by_artist=lt.newList('ARRAY_LIST',key='ObjectID')
+    for i in lt.iterator(catalog['artworks_DateAcquired']):
+        if id_ in i['ConstituentID'][1:-1].split(","):
+            pos_artwork=lt.isPresent(artworks_by_artist,i)
+            if pos_artwork<=0: # Si no está presente
+                lt.addLast(artworks_by_artist, i)
+    return artworks_by_artist,artist,id_
+
+def artist_medium(catalog, artist):
+    mediums= lt.newList('ARRAY_LIST')
+    mediums_count = lt.newList('ARRAY_LIST')
+    artworks_by_artist,artist,id_= artist_artworks(catalog, artist)
+    for i in lt.iterator(artworks_by_artist):
+        posmedium = lt.isPresent(mediums, i['Medium'])
+        if posmedium <= 0: # Si no está el medio en la lista de medios
+            lt.addLast(mediums, i['Medium'])
+            lt.addLast(mediums_count, 1)
+        else: # Si sí está el medio en la lista de medios
+            lt.changeInfo(mediums_count, posmedium, lt.getElement(mediums_count, posmedium)+1)
+    greatest=0
+    pos_actual=0
+    for cuenta_medium in lt.iterator(mediums_count):
+        pos_actual+=1
+        if cuenta_medium > greatest:
+            greatest=cuenta_medium
+            pos_most_used=pos_actual
+    artworks_medium= lt.newList('ARRAY_LIST')        
+    for obra in lt.iterator(artworks_by_artist):
+        if obra['Medium']==lt.getElement(mediums,pos_most_used):
+            lt.addLast(artworks_medium, obra)
+    return artist,id_,artworks_by_artist,mediums,artworks_medium,pos_most_used
+
+# Req. 4
 
 def id_nation(catalog, ids):
     """
@@ -193,37 +231,85 @@ def id_nation(catalog, ids):
             artist = i["Nationality"]
     return artist
 
+# Req. 5
 
-def artist_artworks(catalog, artist):
+def departament_artworks(catalog, department):
     """
-    Nombre, ID y lista de las obras de un artista determinado. O(n)
+    ObjectID de las obras de un departamento determinado. 
+    Ya ordenadas por fecha.
     """
-    id_=id_artist(catalog, artist)
-    list_=lt.newList('ARRAY_LIST')
-    for i in lt.iterator(catalog['artworks_DateAcquired']):
-        if id_ in i['ConstituentID']:                
-            lt.addLast(list_, i)
-    return artist, id_, list_
+    artworks_by_department=lt.newList('ARRAY_LIST',key='ObjectID')
+    for i in lt.iterator(catalog['artworks_Date']):
+        if i['Department'] == department:
+            pos_artwork=lt.isPresent(artworks_by_department,i)
+            if pos_artwork<=0: # Si no está presente
+                lt.addLast(artworks_by_department, i)              
+    return artworks_by_department,department
 
-def artist_medium(catalog, artist):
-    mediums_= lt.newList('ARRAY_LIST')
-    mediums_count = lt.newList('ARRAY_LIST')
-    artist, id_, list_ = artist_artworks(catalog, artist)
-    for i in lt.iterator(list_):
-        posmedium = lt.isPresent(mediums_, i['Medium'])
-        if posmedium == 0:
-            medium = lt.addLast(mediums_, i['Medium'])
-            lt.addLast(mediums_count, 1)
+def condicion(medida):
+    """
+    Si la medida no existe o es 0, que sea 1 para que no afecte la multiplicación.
+    """
+    try:
+        medida=int(medida)
+    except:
+        medida=0
+    medida=medida/100 # Divido en 100 para pasar a metros
+    return medida
+    
+def transport(catalog, department):
+    artworks_by_department,department=departament_artworks(catalog, department)
+    precios_obras=lt.newList('ARRAY_LIST')
+    for obra in lt.iterator(artworks_by_department):
+#         O la obra es circular o tiene longitudes:
+        d1=condicion(obra['Depth (cm)'])
+        d2=condicion(obra['Height (cm)'])
+        d3=condicion(obra['Length (cm)'])
+        d4=condicion(obra['Width (cm)'])
+        if d1!=0:
+            metros=d1
         else:
-            lt.changeInfo(mediums_count, posmedium, lt.getElement(mediums_count, posmedium))
-    greatest=0
-    count=0
-    for num in lt.iterator(mediums_count):
-        count+=1
-        if num > greatest:
-            greatest=num
-            pos_most_used=count
-    return artist,id_, list_,mediums_,mediums_count,pos_most_used
+            d1=1 # Si es 0, lo cambio a 1 para que no afecte la multiplicación de ahorita
+            if d2!=0:
+                metros=d2
+            else:
+                d2=1
+                if d3!=0:
+                    metros=d3
+                else:
+                    d3=1
+                    if d4!=0:
+                        metros=d4
+                    else:
+                        d4=1
+                        metros=0 # Metros es 0 si y sólo si todos son 0
+        if metros!=0: # Alguno no es 0
+            metros=d1*d2*d3*d4      
+#       La obra puede ser circular
+        if condicion(obra['Circumference (cm)']) != 1:
+            circ=condicion(obra['Circumference (cm)'])
+            radio = circ/(6.28318530718) # Circ/2pi = r
+            area = 3.141592*(radio)**2
+        elif condicion(obra['Diameter (cm)']) != 1: # Depronto toca con el diametro
+            d = condicion(obra['Diameter (cm)'])
+            area = 3.141592*(d/2)**2
+        else: # No es circular
+            area=0
+        try:
+            peso = int(obra['Weight (kg)'])
+        except:
+            peso=0.        
+        if peso==0. and area==0 and metros==0: # Ninguna está
+            precio_obra = 48.00
+        else: # alguna está
+            mas_grande= max([peso,area,metros])
+            precio_obra = 72.00*mas_grande
+        lt.addLast(precios_obras,precio_obra)
+    precio_final=0
+    for precio in lt.iterator(precios_obras):
+        precio_final+=precio
+    return artworks_by_department,department,precios_obras,precio_final,peso
+
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
@@ -263,11 +349,23 @@ def compareArtists_BeginDate(artist1,artist2):
     else:
         return 0
 
-def compareartists_artworks(artist_id, artist):
+def compareArtworks_Artist(artist_id, artist):
     if artist_id == artist['artist']:
         return 0
     return -1
     
+def compareArtworks_Date(artwork1,artwork2):
+    """
+    Por antiguedad. Deja las que no tienen fecha al final.
+    """
+    if artwork1["Date"]=="" or artwork2["Date"]=="":
+        if artwork1["Date"]=="":
+            return 0
+        return -1
+    elif artwork1["Date"]<=artwork2["Date"]:
+        return -1
+    return 0
+
 def compareNationality(artist_id, artist):
     if artist_id == artist['nation']:
         return 0
@@ -278,15 +376,15 @@ def compareNationality2(nation1, nation2):
         return -1
     return 0
 
-# =============================================================================
-# def compareArtists__ConstituentID(artist1,artist2):
-#     if artist1["ConstituentID"]<=artist2["ConstituentID"]:
-#         return -1
-#     else:
-#         return 0
-# =============================================================================
-
 # Funciones de ordenamiento
+
+def sortArtists_BeginDate(catalog):
+    sub_list = catalog["artists_BeginDate"].copy()
+    start_time = time.process_time()
+    sorted_list= mer.sort(sub_list, compareArtists_BeginDate)
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)*1000
+    return elapsed_time_mseg, sorted_list
 
 def sortArtworks_DateAcquired(catalog):
     sub_list = catalog["artworks_DateAcquired"].copy()
@@ -296,10 +394,10 @@ def sortArtworks_DateAcquired(catalog):
     elapsed_time_mseg = (stop_time - start_time)*1000
     return elapsed_time_mseg, sorted_list
 
-def sortArtists_BeginDate(catalog):
-    sub_list = catalog["artists_BeginDate"].copy()
+def sortArtworks_Date(catalog):
+    sub_list = catalog["artworks_Date"].copy()
     start_time = time.process_time()
-    sorted_list= mer.sort(sub_list, compareArtists_BeginDate)
+    sorted_list= mer.sort(sub_list, compareArtworks_Date)
     stop_time = time.process_time()
     elapsed_time_mseg = (stop_time - start_time)*1000
     return elapsed_time_mseg, sorted_list
@@ -311,12 +409,3 @@ def sortNationality(catalog):
     stop_time = time.process_time()
     elapsed_time_mseg = (stop_time - start_time)*1000
     return elapsed_time_mseg, sorted_list
-# =============================================================================
-# def sortArtists_ConstituentID(catalog):
-#     sub_list = catalog["artists_ConstituentID"].copy()
-#     start_time = time.process_time()
-#     sorted_list= mer.sort(sub_list, compareArtists__ConstituentID)
-#     stop_time = time.process_time()
-#     elapsed_time_mseg = (stop_time - start_time)*1000
-#     return elapsed_time_mseg, sorted_list
-# =============================================================================
