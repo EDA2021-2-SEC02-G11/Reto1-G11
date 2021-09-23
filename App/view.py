@@ -94,9 +94,9 @@ def printloadData():
     return catalog
     
 def printReq1():
-    start_time = time.process_time()
     anio1=int(input("Digite un año inicial: "))
     anio2=int(input("Digite un año final: "))
+    start_time = time.process_time()
     result=controller.rangoArtists(catalog, anio1, anio2)
     print("======================== Req No. 1 Inputs ========================")
     print("Artistas nacidos entre ",str(anio1)," y ",str(anio2)),"."
@@ -119,9 +119,9 @@ def printReq1():
     print("Se demoro: ",str(elapsed_time_mseg))
     
 def printReq2():
-    start_time = time.process_time()
     fecha1=input("Ingrese una fecha inicial en formato AAAA-MM-DD: ")
     fecha2=input("Ingrese una fecha final en formato AAAA-MM-DD: ")
+    start_time = time.process_time()
     result = controller.rangoArtworks(catalog, fecha1, fecha2)
     num_artists = 5 # TODO: FALTA Toca asociar con los artistas para esto
     num_purchased = 5 # TODO: Falta
@@ -149,8 +149,8 @@ def printReq2():
     print("Se demoro: ",str(elapsed_time_mseg))
     
 def printReq3():
-    start_time = time.process_time()
     artist=input("Ingrese el nombre del artista: ")
+    start_time = time.process_time()
     artist,id_,artworks_by_artist,mediums,artworks_medium,pos_most_used=controller.artist_medium1(catalog,artist)
     print("======================== Req No. 3 Inputs ========================")
     print("Examinar el trabajo del artista de nombre: ",artist)
@@ -208,6 +208,7 @@ def printReq4(catalog):
     
 def printReq5():
     department=input("Ingrese el nombre del departamento: ")
+    start_time = time.process_time()
     artworks_by_department,department,precios_obras,precio_final,peso=controller.transport(catalog, department)
     print("======================== Req No. 5 Inputs ========================")
     print('Estime el costo de transportar todas las obras del departamento '+department+' del MoMA.')
@@ -232,7 +233,9 @@ def printReq5():
                        'Medio':20,'Dimensiones':40,'Costo':15}
     print(answ)
     print("Las cinco obras más costosas que se van a transportar son: ")
-    
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)*1000
+    print("Se demoro: ",str(elapsed_time_mseg))
 def printReq6():
     print("Este requerimiento aún no se ha implementado.")
     
