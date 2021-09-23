@@ -25,6 +25,7 @@ import sys
 import controller
 from DISClib.ADT import list as lt
 from prettytable import PrettyTable
+import time
 assert cf
 
 """
@@ -82,6 +83,7 @@ def printloadData():
     return catalog
     
 def printReq1():
+    start_time = time.process_time()
     anio1=int(input("Digite un año inicial: "))
     anio2=int(input("Digite un año final: "))
     result=controller.rangoArtists(catalog, anio1, anio2)
@@ -101,8 +103,12 @@ def printReq1():
                       lt.getElement(result,i)['Gender']])
     answ._max_width = {'Nombre':40}
     print(answ)    
-    
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)*1000
+    print("Se demoro: ",str(elapsed_time_mseg))
+
 def printReq2():
+    start_time = time.process_time()
     fecha1=input("Ingrese una fecha inicial en formato AAAA-MM-DD: ")
     fecha2=input("Ingrese una fecha final en formato AAAA-MM-DD: ")
     result = controller.rangoArtworks(catalog, fecha1, fecha2)
@@ -126,8 +132,12 @@ def printReq2():
     answ._max_width = {'Título':40,'Artista(s)':20,'Fecha':20,'Medio':40,
                         'Dimensiones':40}
     print(answ)
-    
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)*1000
+    print("Se demoro: ",str(elapsed_time_mseg))
+
 def printReq3():
+    start_time = time.process_time()
     artist=input("Ingrese el nombre del artista: ")
     artist,id_, list_,mediums_,mediums_count,pos_most_used=controller.artist_medium(catalog,artist)
     print("======================== Req No. 3 Inputs ========================")
@@ -140,7 +150,9 @@ def printReq3():
 #     print('Usó ',mediums_count,' medios o técnicas distintas en su trabajo.')
 #     print('La técnica que más usó es: ',lt.getElement(mediums_,pos_most_used),'.')
 # =============================================================================
-def printReq4(catalog):
+
+def printReq4():
+    start_time = time.process_time()
     print("======================== Req No. 4 Inputs ========================")
     print("Ranking de paises por su numero de obras en el MoMa ")
     print("======================== Req No. 4 Respuesta ========================")
@@ -169,6 +181,10 @@ def printReq4(catalog):
     answ._max_width = {'ID':20,'Titulo':40,"Nombre del artista":20,"Medium":20,
                     "Fecha":20,"Dimensiones":20,"Departamento":20,"Clasificacion":20,"URL":40}
     print(answ)
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)*1000
+    print("Se demoro: ",str(elapsed_time_mseg))
+
 def printReq5():
     print("Este requerimiento aún no se ha implementado.")
     
@@ -213,7 +229,7 @@ while True:
         elif inputs==3:
             printReq3()
         elif inputs==4:
-            printReq4(catalog)
+            printReq4()
         elif inputs==5:
             printReq5()
         elif inputs==6:
