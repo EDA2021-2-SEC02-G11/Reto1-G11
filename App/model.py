@@ -114,10 +114,10 @@ def newNationality(nation):
     """
     Crea una nueva estructura para modelar los autores de cada obra
     """
-    artwork_artist = {'nation':"",'artworks':None}
-    artwork_artist['nation'] = nation
-    artwork_artist['artworks'] = lt.newList('ARRAY_LIST')
-    return artwork_artist
+    nationality = {'nation':"",'artworks':None}
+    nationality['nation'] = nation
+    nationality['artworks'] = lt.newList('ARRAY_LIST')
+    return nationality
 
 # Funciones de consulta
 
