@@ -207,7 +207,7 @@ def artist_medium(catalog, artist):
     for i in lt.iterator(artworks_by_artist):
         posmedium = lt.isPresent(mediums, i['Medium'])
         if posmedium <= 0: # Si no está el medio en la lista de medios
-            medium = lt.addLast(mediums, i['Medium'])
+            lt.addLast(mediums, i['Medium'])
             lt.addLast(mediums_count, 1)
         else: # Si sí está el medio en la lista de medios
             lt.changeInfo(mediums_count, posmedium, lt.getElement(mediums_count, posmedium)+1)
@@ -218,7 +218,11 @@ def artist_medium(catalog, artist):
         if cuenta_medium > greatest:
             greatest=cuenta_medium
             pos_most_used=pos_actual
-    return artist,id_,artworks_by_artist,mediums,mediums_count,pos_most_used
+    artworks_medium= lt.newList('ARRAY_LIST')        
+    for obra in lt.iterator(artworks_by_artist):
+        if obra['Medium']==lt.getElement(mediums,pos_most_used):
+            lt.addLast(artworks_medium, obra)
+    return artist,id_,artworks_by_artist,mediums,artworks_medium,pos_most_used
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 

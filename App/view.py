@@ -62,17 +62,29 @@ def printloadData():
           str(lt.size(catalog['artworks_DateAquired'])))
     print("Se demoro: ",str(artist[0]))
     print('\nÚltimos tres artistas cargados:\n')
-    for i in [-2,-1,0]:
-        print(str(lt.getElement(catalog['artists_BeginDate'],i)))
+    answ = PrettyTable(['Nombre','Nacimiento','Fallecimiento'
+                        ,'Nacionalidad','Género'])
+    for i in [-2,-1,0]:        
+        answ.add_row([lt.getElement(catalog['artists_BeginDate'],i)['DisplayName'],
+                      lt.getElement(catalog['artists_BeginDate'],i)['BeginDate'],
+                      lt.getElement(catalog['artists_BeginDate'],i)['EndDate'],
+                      lt.getElement(catalog['artists_BeginDate'],i)['Nationality'],
+                      lt.getElement(catalog['artists_BeginDate'],i)['Gender']])
+    answ._max_width = {'Nombre':40}
+    print(answ)
     print("Se demoro: ",str(artwork[0]))
     print('\nÚltimas tres obras de arte cargadas:\n')
-    for i in [-2,-1,0]:
-        print(str(lt.getElement(catalog['artworks_DateAquired'],i)))
-        
-        # Toca quitar lo de artists_artworks esto del cargar datos, pero funciona!
-    print('\nARTISTS ARTWORKS:\n')
-    for i in [12,13,14]:
-        print(str(lt.getElement(catalog['artworks_Artist'],i)))
+    answ1 = PrettyTable(['Título','Medio o técnica','Fecha'
+                        ,'Adquisición','Dimensiones'])
+    for i in [-2,-1,0]:       
+        answ1.add_row([lt.getElement(catalog['artworks_DateAcquired'],i)['Title'],
+                      lt.getElement(catalog['artworks_DateAcquired'],i)['Medium'],
+                      lt.getElement(catalog['artworks_DateAcquired'],i)['Date'],
+                      lt.getElement(catalog['artworks_DateAcquired'],i)['DateAcquired'],
+                      lt.getElement(catalog['artworks_DateAcquired'],i)['Dimensions']])
+    answ1._max_width = {'Título':40,'Medio o técnica':20,'Fecha':20,'Adquisición':40,
+                        'Dimensiones':40}
+    print(answ1)
     return catalog
     
 def printReq1():
@@ -109,29 +121,38 @@ def printReq2():
           " y ",fecha2," con ",str(num_artists),
           " artistas, de las cuales compró ",str(num_purchased))
     print('\nPrimeras y últimas tres obras adquiridas en el rango de fechas:\n')
-    answ = PrettyTable(['Título','Artista(s)','Fecha','Medio',
+    answ = PrettyTable(['Título','Artista(s)','Fecha','Adquisición','Medio',
                         'Dimensiones'])
     for i in [1,2,3,-2,-1,0]:        
         answ.add_row([lt.getElement(result,i)['Title'],
                       lt.getElement(result,i)['ConstituentID'], # TODO: Artista
+                      lt.getElement(result,i)['Date'],
                       lt.getElement(result,i)['DateAcquired'],
                       lt.getElement(result,i)['Medium'],
                       lt.getElement(result,i)['Dimensions']])
-    answ._max_width = {'Título':40,'Artista(s)':20,'Fecha':20,'Medio':40,
-                        'Dimensiones':40}
+    answ._max_width = {'Título':40,'Artista(s)':20,'Fecha':15,'Adquisición':15,
+                       'Medio':20,'Dimensiones':40}
     print(answ)
     
 def printReq3():
     artist=input("Ingrese el nombre del artista: ")
-    artist,id_,artworks_by_artist,mediums,mediums_count,pos_most_used=controller.artist_medium(catalog,artist)
+    artist,id_,artworks_by_artist,mediums,artworks_medium,pos_most_used=controller.artist_medium(catalog,artist)
     print("======================== Req No. 3 Inputs ========================")
     print("Examinar el trabajo del artista de nombre: ",artist)
     print("======================== Req No. 3 Respuesta ========================")
-    print("El artista ",str(artist).strip(),' con código ',str(id_),' tiene ',
-          str(lt.size(artworks_by_artist)), 'obras en el MoMA.')
-    print('Usó ',str(lt.size(mediums)),' medios o técnicas distintas en su trabajo.')
-    print('La técnica que más usó es: ',str(lt.getElement(mediums,pos_most_used)),'.')
+    print("El artista "+str(artist).strip()+' con código '+str(id_).strip()+' tiene '+
+          str(lt.size(artworks_by_artist)).strip()+' obras en el MoMA.')
+    print('Usó '+str(lt.size(mediums)).strip()+' medios o técnicas distintas en su trabajo.')
+    print('La técnica que más usó es: '+str(lt.getElement(mediums,pos_most_used)).strip()+'. La usó en '+str(lt.size(artworks_medium)).strip()+' obras')
     print('El listado de las obras de dicha técnica es: ')
+    answ1 = PrettyTable(['Título','Fecha','Adquisición',
+                         'Medio o técnica','Dimensiones'])
+    for i in lt.iterator(artworks_medium):       
+        answ1.add_row([i['Title'],i['Date'],i['DateAcquired'],i['Medium'],
+                      i['Dimensions']])
+    answ1._max_width = {'Título':40,'Medio o técnica':20,'Fecha':20,'Adquisición':40,
+                        'Dimensiones':40}
+    print(answ1)
     
 def printReq4():
     print("Este requerimiento aún no se ha implementado.")
