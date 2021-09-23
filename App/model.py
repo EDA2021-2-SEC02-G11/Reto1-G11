@@ -225,10 +225,12 @@ def id_nation(catalog, ids):
     """
     retorna la nacion de un artista. O(n)
     """
-    artist="Unknown"
     for i in lt.iterator(catalog['artists_BeginDate']):
         if int(i['ConstituentID'])==int(ids):
             artist = i["Nationality"]
+            if artist=="" or artist=="Nationality unknown":
+                artist="Unknown"
+            break
     return artist
 
 # Req. 5
