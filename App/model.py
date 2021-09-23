@@ -180,7 +180,7 @@ def id_artist(catalog, artist):
         if i['DisplayName']==artist:
             id_ = i['ConstituentID']
             break
-    return id_
+    return id_,artist
 
 def artist_artworks(catalog, artist):
     """
@@ -195,6 +195,37 @@ def artist_artworks(catalog, artist):
                 lt.addLast(artworks_by_artist, i)
     return artworks_by_artist,artist,id_
 
+def artist_medium1(catalog, artist):
+    mediums= lt.newList('ARRAY_LIST')
+    mediums_count = lt.newList('ARRAY_LIST')
+    id_,artist=id_artist(catalog, artist)
+    for i in lt.iterator(catalog['artworks_Artist']):
+        if int(i['artist']) == int(id_):
+            artworks_by_artist=i['artworks']
+            break
+    for i in lt.iterator(artworks_by_artist):
+        posmedium = lt.isPresent(mediums, i['Medium'])
+        if posmedium <= 0: # Si no está el medio en la lista de medios
+            lt.addLast(mediums, i['Medium'])
+            lt.addLast(mediums_count, 1)
+        else: # Si sí está el medio en la lista de medios
+            lt.changeInfo(mediums_count, posmedium, lt.getElement(mediums_count, posmedium)+1)
+    greatest=0
+    pos_actual=0
+    for cuenta_medium in lt.iterator(mediums_count):
+        pos_actual+=1
+        if cuenta_medium > greatest:
+            greatest=cuenta_medium
+            pos_most_used=pos_actual
+    artworks_medium= lt.newList('ARRAY_LIST')        
+    for obra in lt.iterator(artworks_by_artist):
+        if obra['Medium']==lt.getElement(mediums,pos_most_used):
+            lt.addLast(artworks_medium, obra)
+    return artist,id_,artworks_by_artist,mediums,artworks_medium,pos_most_used
+
+# Forma alternativa de implementar el Req. 3 sin usar la lista 'artworks_Artist'
+# del catálogo. Esta no es la que se usa porque es más rápido ayudarse con la
+#lista que se carga directamente del catálogo.
 def artist_medium(catalog, artist):
     mediums= lt.newList('ARRAY_LIST')
     mediums_count = lt.newList('ARRAY_LIST')

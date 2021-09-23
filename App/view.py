@@ -151,7 +151,7 @@ def printReq2():
 def printReq3():
     start_time = time.process_time()
     artist=input("Ingrese el nombre del artista: ")
-    artist,id_,artworks_by_artist,mediums,artworks_medium,pos_most_used=controller.artist_medium(catalog,artist)
+    artist,id_,artworks_by_artist,mediums,artworks_medium,pos_most_used=controller.artist_medium1(catalog,artist)
     print("======================== Req No. 3 Inputs ========================")
     print("Examinar el trabajo del artista de nombre: ",artist)
     print("======================== Req No. 3 Respuesta ========================")
