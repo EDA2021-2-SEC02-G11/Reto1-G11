@@ -54,8 +54,10 @@ def printloadData():
     loadData(catalog)
     artist=controller.sortArtists_BeginDate(catalog)
     artwork=controller.sortArtworks_DateAcquired(catalog)
+    artwork_date=controller.sortArtworks_Date(catalog)
     catalog["artists_BeginDate"]=artist[1]
     catalog["artworks_DateAquired"]=artwork[1]
+    catalog["artworks_Date"]=artwork_date[1]
     print('Número de artistas en el catálogo: ',
           str(lt.size(catalog['artists_BeginDate'])))
     print('Número de obras de arte en el catálogo: ',

@@ -50,13 +50,13 @@ def newCatalog():
     """
     catalog = {'artists_BeginDate': None,
                'artworks_DateAcquired': None,
-#               'artworks_Date': None,
+               'artworks_Date': None,
                'artworks_Artist':None,
                'nationality':None}
     
     catalog['artists_BeginDate'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtists_BeginDate)
     catalog['artworks_DateAcquired'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_DateAcquired)
-#    catalog['artworks_Date'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_Date)
+    catalog['artworks_Date'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_Date)
     catalog['artworks_Artist'] = lt.newList('ARRAY_LIST', cmpfunction=compareArtworks_Artist)
     catalog['nationality'] = lt.newList('ARRAY_LIST', cmpfunction=compareNationality)
 
@@ -68,9 +68,9 @@ def addArtist(catalog, artist):
     lt.addLast(catalog['artists_BeginDate'], artist)
     ids=artist["Nationality"]
 
-
 def addArtwork(catalog, artwork):
     lt.addLast(catalog['artworks_DateAcquired'], artwork)
+    lt.addLast(catalog['artworks_Date'], artwork)
     ids = artwork['ConstituentID']
     ids = ids[1:-1].split(",")
     for id_ in ids:
@@ -283,6 +283,18 @@ def compareArtworks_Artist(artist_id, artist):
         return 0
     return -1
     
+def compareArtworks_Date(artwork1,artwork2):
+    """
+    Por antiguedad. Deja las que no tienen fecha al final.
+    """
+    if artwork1["Date"]=="" or artwork2["Date"]=="":
+        if artwork1["Date"]=="":
+            return 0
+        return -1
+    elif artwork1["Date"]<=artwork2["Date"]:
+        return -1
+    return 0
+
 def compareNationality(artist_id, artist):
     if artist_id == artist['artist']:
         return 0
@@ -302,6 +314,14 @@ def sortArtworks_DateAcquired(catalog):
     sub_list = catalog["artworks_DateAcquired"].copy()
     start_time = time.process_time()
     sorted_list= mer.sort(sub_list, compareArtworks_DateAcquired)
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)*1000
+    return elapsed_time_mseg, sorted_list
+
+def sortArtworks_Date(catalog):
+    sub_list = catalog["artworks_Date"].copy()
+    start_time = time.process_time()
+    sorted_list= mer.sort(sub_list, compareArtworks_Date)
     stop_time = time.process_time()
     elapsed_time_mseg = (stop_time - start_time)*1000
     return elapsed_time_mseg, sorted_list
