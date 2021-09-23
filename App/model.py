@@ -224,6 +224,20 @@ def artist_medium(catalog, artist):
             lt.addLast(artworks_medium, obra)
     return artist,id_,artworks_by_artist,mediums,artworks_medium,pos_most_used
 
+# Req. 5
+
+def departament_artworks(catalog, department):
+    """
+    ObjectID de las obras de un departamento determinado.
+    """
+    artworks_by_department=lt.newList('ARRAY_LIST',key='ObjectID')
+    for i in ltiterator(catalog['artworks_DateAcquired']):
+        if i['Department'] == department:
+            pos_artwork=lt.isPresent(artworks_by_department,i)
+            if pos_artwork<=0: # Si no está presente
+                lt.addLast(artworks_by_department, i)              
+    return artworks_by_department,department
+
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 def compareArtworks_DateAcquired(artwork1:dict , artwork2:dict)->int:

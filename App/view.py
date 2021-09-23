@@ -158,7 +158,19 @@ def printReq4():
     print("Este requerimiento aún no se ha implementado.")
     
 def printReq5():
-    print("Este requerimiento aún no se ha implementado.")
+    department=input("Ingrese el nombre del departamento: ")
+    
+    
+    print("======================== Req No. 5 Inputs ========================")
+    print('Estime el costo de transportar todas las obras del departamento '+department+' del MoMA.')
+    print("======================== Req No. 5 Respuesta ========================")
+    print('El MoMA transportará '+str(777)+' obras del departamento '+department+'.')
+    print('El precio estimado del servicio es: $'+str(777)+' USD.')
+    print('El peso estimado de todas las obras es de: '+str(777)+' kg.')
+    print("Las cinco obras más antiguas que se van a transportar son: ")
+    # FALTA
+    print("Las cinco obras más costosas que se van a transportar son: ")
+    # FALTA
     
 def printReq6():
     print("Este requerimiento aún no se ha implementado.")
