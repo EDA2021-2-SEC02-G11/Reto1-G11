@@ -190,9 +190,7 @@ def artist_artworks(catalog, artist):
     artworks_by_artist=lt.newList('ARRAY_LIST',key='ObjectID')
     for i in lt.iterator(catalog['artworks_DateAcquired']):
         if id_ in i['ConstituentID'][1:-1].split(","):
-            pos_artwork=lt.isPresent(artworks_by_artist,i)
-            if pos_artwork<=0: # Si no está presente
-                lt.addLast(artworks_by_artist, i)
+            lt.addLast(artworks_by_artist, i)
     return artworks_by_artist,artist,id_
 
 def artist_medium1(catalog, artist):
@@ -274,9 +272,7 @@ def departament_artworks(catalog, department):
     artworks_by_department=lt.newList('ARRAY_LIST',key='ObjectID')
     for i in lt.iterator(catalog['artworks_Date']):
         if i['Department'] == department:
-            pos_artwork=lt.isPresent(artworks_by_department,i)
-            if pos_artwork<=0: # Si no está presente
-                lt.addLast(artworks_by_department, i)              
+            lt.addLast(artworks_by_department, i)              
     return artworks_by_department,department
 
 def condicion(medida):
